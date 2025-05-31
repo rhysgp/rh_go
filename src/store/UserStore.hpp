@@ -38,7 +38,8 @@ class InMemoryUserStore : public UserStore {
     if (it == users.end()) {
         throw EntityNotFoundException(std::format("Failed to find user with id `{}`", boost::uuids::to_string(id)));
       }
-    return it->second;  }
+    return it->second;
+  }
 
  private:
   mutable std::shared_mutex mtx;

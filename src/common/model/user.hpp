@@ -5,6 +5,8 @@
 #include <utility>
 #include <string>
 #include <optional>
+#include <ostream>
+
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
@@ -25,8 +27,27 @@ class User {
         m_dateOfBirth (date_of_birth), m_created (created), m_updated (updated)
   {}
 
-  [[nodiscard]] boost::uuids::uuid id() const { return m_id; }
+  bool operator==(const User& other) const = default;
 
+  std::ostream& operator<<(std::ostream& os) {
+    os << "User{"
+       << "id=" << m_id
+       << ", name=" << m_name
+       << ", displayName=" << m_displayName;
+    if (m_dateOfBirth) {
+        auto dob = *m_dateOfBirth;
+        os << ", dob=" << static_cast<int>(dob.year()) << "-"
+           << static_cast<unsigned>(dob.month()) << "-"
+           << static_cast<unsigned>(dob.day());
+      } else {
+        os << ", dob=null";
+      }
+    os << ", created=[...], updated=[...]"
+       << "}";
+    return os;
+  }
+
+  [[nodiscard]] boost::uuids::uuid id() const { return m_id; }
   [[nodiscard]] const std::string& name() const { return m_name; }
   [[nodiscard]] const std::string& displayName() const { return m_displayName; }
   [[nodiscard]] const std::optional<std::chrono::year_month_day>& dateOfBirth() const { return m_dateOfBirth; }
