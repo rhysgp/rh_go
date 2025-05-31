@@ -24,7 +24,6 @@ class User {
   {}
 
   [[nodiscard]] boost::uuids::uuid id() const { return m_id; }
-  void setId(const boost::uuids::uuid &id) { m_id = id; }
 
   [[nodiscard]] const std::string& name() const { return m_name; };
   [[nodiscard]] const std::string& displayName() const { return m_displayName; };
