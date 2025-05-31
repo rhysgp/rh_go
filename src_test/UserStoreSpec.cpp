@@ -1,4 +1,9 @@
-#include <boost/test/unit_test.hpp>
+
+#define BOOST_TEST_MODULE egg benny smoked salmon tests
+#define BOOST_TEST_DYN_LINK
+
+#include <boost/test/included/unit_test.hpp>
+
 #include "../src/store/UserStore.hpp"
 
 BOOST_AUTO_TEST_CASE( users_are_retrievable_after_being_added )
@@ -10,4 +15,3 @@ BOOST_AUTO_TEST_CASE( users_are_retrievable_after_being_added )
   store.createOrUpdate(newUser);
   BOOST_TEST(store.findUser(id) == newUser);
 }
-

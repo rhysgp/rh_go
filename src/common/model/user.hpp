@@ -29,13 +29,13 @@ class User {
 
   bool operator==(const User& other) const = default;
 
-  std::ostream& operator<<(std::ostream& os) {
+  friend std::ostream& operator<<(std::ostream& os, const User& user) {
     os << "User{"
-       << "id=" << m_id
-       << ", name=" << m_name
-       << ", displayName=" << m_displayName;
-    if (m_dateOfBirth) {
-        auto dob = *m_dateOfBirth;
+       << "id=" << user.m_id
+       << ", name=" << user.m_name
+       << ", displayName=" << user.m_displayName;
+    if (user.m_dateOfBirth) {
+        auto dob = *user.m_dateOfBirth;
         os << ", dob=" << static_cast<int>(dob.year()) << "-"
            << static_cast<unsigned>(dob.month()) << "-"
            << static_cast<unsigned>(dob.day());
