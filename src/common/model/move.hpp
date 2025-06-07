@@ -1,6 +1,8 @@
 #ifndef COMMON_MODEL_MOVE_HPP
 #define COMMON_MODEL_MOVE_HPP
 
+#include <utility>
+
 #include "position.hpp"
 #include "user.hpp"
 
@@ -11,9 +13,13 @@ public:
   virtual bool isPlay() const = 0;
   virtual bool isUndo() const = 0;
 
+  [[nodiscard]] virtual std::unique_ptr<Move> clone() const = 0;
+
   [[nodiscard]] std::chrono::time_point<std::chrono::system_clock> timePlayed() const {
     return m_timePlayed;
   }
+
+  virtual void print(std::ostream&) const = 0;
 
 protected:
   Move() : m_timePlayed(std::chrono::system_clock::now()) {}
@@ -29,12 +35,25 @@ protected:
 
 class PlayMove final : public Move {
 public:
-  PlayMove(const Position& position, bool black): m_position(position), m_black(black) {}
+  PlayMove(Position  position, bool black): m_position(std::move(position)), m_black(black) {}
   PlayMove(const PlayMove& other) : Move(other.m_timePlayed), m_position(other.m_position), m_black(other.m_black) {}
   PlayMove(PlayMove&& other) noexcept : Move(std::move(other.m_timePlayed)), m_position(std::move(other.m_position)), m_black(other.m_black) {} // nothing to nullify on `other`
 
   PlayMove& operator=(const PlayMove&) = default;
   PlayMove& operator=(PlayMove&&) = default;
+
+  [[nodiscard]] std::unique_ptr<Move> clone() const override {
+    return std::make_unique<PlayMove>(*this);  // Use copy constructor
+  }
+
+  void print(std::ostream& os) const override {
+    os << "PlayMove{ "
+       << (m_black ? "BLACK " : "WHITE ")
+       << m_position.horizontal()
+       << " / "
+       << m_position.vertical()
+       << " }";
+  }
 
   [[nodiscard]] bool isPlay() const override { return true; }
   [[nodiscard]] bool isUndo() const override { return false; }
@@ -57,6 +76,13 @@ public:
   bool isPlay() const override { return false; }
   bool isUndo() const override { return true; }
 
+  void print(std::ostream& os) const override {
+    os << "UndoMove{}";
+  }
+
+  [[nodiscard]] std::unique_ptr<Move> clone() const override {
+    return std::make_unique<UndoMove>(*this);
+  }
 };
 
 #endif

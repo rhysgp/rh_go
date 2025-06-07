@@ -6,6 +6,7 @@
 #include <string>
 #include <optional>
 #include <ostream>
+#include <format>
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -42,7 +43,7 @@ class User {
       } else {
         os << ", dob=null";
       }
-    os << ", created=[...], updated=[...]"
+    os << ", created=[" << std::format("{:%Y-%m-%d %H:%M:%S}", user.m_created) << "], updated=[...]"
        << "}";
     return os;
   }

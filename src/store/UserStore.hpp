@@ -18,9 +18,7 @@ class UserStore {
   UserStore() = default;
 
   virtual void createOrUpdate(const User& user) = 0;
-  virtual const User& findUser(const boost::uuids::uuid& id) const = 0;
-
-
+  [[nodiscard]] virtual const User& findUser(const boost::uuids::uuid& id) const = 0;
 };
 
 class InMemoryUserStore : public UserStore {
@@ -29,7 +27,7 @@ class InMemoryUserStore : public UserStore {
 
   void createOrUpdate(const User& user) override {
     std::unique_lock lock(mtx);
-    users[user.id()] = user;
+    users.insert_or_assign(user.id(), user);
   }
 
   const User& findUser(const boost::uuids::uuid& id) const override {

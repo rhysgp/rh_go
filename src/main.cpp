@@ -4,6 +4,7 @@
 
 #include "common/model/user.hpp"
 #include "common/model/game.hpp"
+#include "store/GameStore.hpp"
 
 int main ()
 {
