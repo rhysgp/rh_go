@@ -10,8 +10,8 @@ class Move {
 public:
   virtual ~Move() = default;
 
-  virtual bool isPlay() const = 0;
-  virtual bool isUndo() const = 0;
+  [[nodiscard]] virtual bool isPlay() const = 0;
+  [[nodiscard]] virtual bool isUndo() const = 0;
 
   [[nodiscard]] virtual std::unique_ptr<Move> clone() const = 0;
 
@@ -19,11 +19,13 @@ public:
     return m_timePlayed;
   }
 
+  [[nodiscard]] virtual const Position& position() const = 0;
+
   virtual void print(std::ostream&) const = 0;
 
 protected:
   Move() : m_timePlayed(std::chrono::system_clock::now()) {}
-  Move(const std::chrono::time_point<std::chrono::system_clock>& timePlayed) : m_timePlayed(timePlayed) {}
+  explicit Move(const std::chrono::time_point<std::chrono::system_clock>& timePlayed) : m_timePlayed(timePlayed) {}
 
   Move(const Move&) = default;
   Move(Move&&) = default;
@@ -37,7 +39,7 @@ class PlayMove final : public Move {
 public:
   PlayMove(Position  position, bool black): m_position(std::move(position)), m_black(black) {}
   PlayMove(const PlayMove& other) : Move(other.m_timePlayed), m_position(other.m_position), m_black(other.m_black) {}
-  PlayMove(PlayMove&& other) noexcept : Move(std::move(other.m_timePlayed)), m_position(std::move(other.m_position)), m_black(other.m_black) {} // nothing to nullify on `other`
+  PlayMove(PlayMove&& other) noexcept : Move(other.m_timePlayed), m_position(std::move(other.m_position)), m_black(other.m_black) {} // nothing to nullify on `other`
 
   PlayMove& operator=(const PlayMove&) = default;
   PlayMove& operator=(PlayMove&&) = default;
@@ -57,7 +59,7 @@ public:
 
   [[nodiscard]] bool isPlay() const override { return true; }
   [[nodiscard]] bool isUndo() const override { return false; }
-  [[nodiscard]] const Position& position() const { return m_position; }
+  [[nodiscard]] const Position& position() const override { return m_position; }
   [[nodiscard]] bool isBlack() const { return m_black; }
 
 
@@ -73,12 +75,14 @@ class UndoMove final : public Move {
 public:
   UndoMove() = default;
 
-  bool isPlay() const override { return false; }
-  bool isUndo() const override { return true; }
+  [[nodiscard]] bool isPlay() const override { return false; }
+  [[nodiscard]] bool isUndo() const override { return true; }
 
   void print(std::ostream& os) const override {
     os << "UndoMove{}";
   }
+
+  [[nodiscard]] const Position& position() const override { throw std::logic_error("Undo move has no explicit position"); }
 
   [[nodiscard]] std::unique_ptr<Move> clone() const override {
     return std::make_unique<UndoMove>(*this);
